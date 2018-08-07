@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html>
+    
+	<head>
+        <title>Web Application for Design and Predictive Evaluation of Virtual On-Screen Keyboard</title>
+        <meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<!-- test 
+		<meta http-equiv="refresh" content="3" >
+		 /test -->
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/footer.css">
+    </head> 
+	
+    <body>
+	    <script src="js/d3.min.js"></script>
+		<script src="js/jquery-3.3.1.slim.min.js"></script>
+		<script src="js/popper.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+
+		<!-- Set keyboard size, add new default keys -->
+		<nav class="bg-dark" id="generalsettings">
+			<form class="form-inline justify-content-md-center">
+				<div class="form-group text-light">
+					<label for="kbwidth" style="padding:10px">Keyboard width</label>
+					<input class="form-control" type="number" id="kbwidth">
+				</div>
+				<div class="form-group text-light">
+					<label for="kbheight" style="padding:10px">Keyboard height</label>
+					<input class="form-control" type="number" id="kbheight">
+				</div>
+				<div class="form-group" style="padding:10px; border-right:solid white">
+					<button type="button" class="btn btn-success" id="kbsize">Submit</button>
+				</div>
+				<div class="form-group" style="padding:10px">
+					<button type="button" class="btn btn-primary" id="addkey">Add key</button>
+				</div>
+			</form>
+		</nav>
+		
+		<!-- App body -->
+		<div id="appbody"></div>
+		
+		<!-- Save and Load Keyboard -->
+		<footer class="footer" id="footer">
+			<div class="container">
+				<button type="button" class="btn btn-success" id="saveKeyboard">Save keyboard</button>
+				<button type="button" class="btn btn-primary" id="loadKeyboard">Load keyboard</button>
+			</div>
+		</footer>
+
+		<script src="js/script.js"></script>
+
+	</body>
+
+</html>
