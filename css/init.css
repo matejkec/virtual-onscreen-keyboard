@@ -1,0 +1,39 @@
+.key{
+	fill:#808080;
+	stroke:black;
+	stroke-width:0.5px;	
+	cursor: pointer;
+}
+.active {
+	stroke: #505050;
+	stroke-width: 2px;
+}
+
+.def{
+	stroke: #0a3fcf;
+	fill:#0a73cf;
+	opacity:0.8;
+}
+
+.fontKey{
+	font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;   
+    cursor: inherit;
+    display: block;
+}

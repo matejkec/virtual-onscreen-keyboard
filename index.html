@@ -1,57 +1,142 @@
 <!DOCTYPE html>
 
 <html>
-    
-	<head>
-        <title>Web Application for Design and Predictive Evaluation of Virtual On-Screen Keyboard</title>
-        <meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<!-- test 
-		<meta http-equiv="refresh" content="3" >
-		 /test -->
-		<link rel="stylesheet" href="css/bootstrap.min.css">
-		<link rel="stylesheet" href="css/footer.css">
-    </head> 
-	
-    <body>
-	    <script src="js/d3.min.js"></script>
-		<script src="js/jquery-3.3.1.slim.min.js"></script>
-		<script src="js/popper.min.js"></script>
-		<script src="js/bootstrap.min.js"></script>
 
-		<!-- Set keyboard size, add new default keys -->
-		<nav class="bg-dark" id="generalsettings">
-			<form class="form-inline justify-content-md-center">
-				<div class="form-group text-light">
-					<label for="kbwidth" style="padding:10px">Keyboard width</label>
-					<input class="form-control" type="number" id="kbwidth">
-				</div>
-				<div class="form-group text-light">
-					<label for="kbheight" style="padding:10px">Keyboard height</label>
-					<input class="form-control" type="number" id="kbheight">
-				</div>
-				<div class="form-group" style="padding:10px; border-right:solid white">
-					<button type="button" class="btn btn-success" id="kbsize">Submit</button>
-				</div>
-				<div class="form-group" style="padding:10px">
-					<button type="button" class="btn btn-primary" id="addkey">Add key</button>
-				</div>
-			</form>
-		</nav>
-		
-		<!-- App body -->
-		<div id="appbody"></div>
-		
-		<!-- Save and Load Keyboard -->
-		<footer class="footer" id="footer">
-			<div class="container">
-				<button type="button" class="btn btn-success" id="saveKeyboard">Save keyboard</button>
-				<button type="button" class="btn btn-primary" id="loadKeyboard">Load keyboard</button>
-			</div>
-		</footer>
+<head>
+    <title>Web Application for Design and Predictive Evaluation of Virtual On-Screen Keyboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/init.css">
+</head>
 
-		<script src="js/script.js"></script>
+<body>
+    <script src="js/d3.min.js"></script>
+    <script src="js/jquery-3.3.1.slim.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
 
-	</body>
+    <!-- Set keyboard size, add new default keys -->
+    <nav class="bg-dark navbar fontKey" id="generalsettings">
+        <div class="container-fluid justify-content-md-center">
+            <form class="form-inline" id="gSettings">
+                <div class="form-group text-light">
+                    <label for="kbwidth" style="padding:10px">Keyboard width</label>
+                    <input class="form-control" type="number" id="kbwidth">
+                </div>
+                <div class="form-group text-light">
+                    <label for="kbheight" style="padding:10px">Keyboard height</label>
+                    <input class="form-control" type="number" id="kbheight">
+                </div>
+                <div class="form-group" style="padding:10px;">
+                    <button type="button" class="btn btn-secondary" id="kbsize">Set</button>
+                </div>
+                <div class="form-group" style="padding:10px">
+                    <button type="button" class="btn btn-primary" id="start">Start</button>
+                </div>
+            </form>
+            <form class="form-inline" id="keyOption" style="display: none;">
+                <div class="form-group text-light" id="charDiv" style="display: none;">
+                    <label for="kchar" style="padding:10px">Char</label>
+                    <input class="form-control" type="text" id="kchar">
+                </div>
+                <div class="form-group" style="padding:10px;">
+                    <button type="button" class="btn btn-secondary" id="setChar" style="display: none;">Set</button>
+                </div>
+                <div class="form-group" style="padding:10px;">
+                    <button type="button" class="btn btn-info" id="editKey" data-toggle="modal" data-target="#myModal" style="display: none;">Edit key</button>
+                </div>
+                <div class="form-group" style="padding:10px;">
+                    <button type="button" class="btn btn-info" id="rotate" style="display: none;">Rotate</button>
+                </div>
+                <div class="form-group" style="padding:10px">
+                    <button type="button" class="btn btn-danger" id="delete" style="display: none;">Delete</button>
+                </div>
+                <div class="form-group" style="padding:10px">
+                    <button type="button" class="btn btn-primary" id="addkey">New key</button>
+                </div>
+            </form>
+        </div>
+    </nav>
 
+    <!-- App body -->
+    <div id="appbody"></div>
+
+    <!-- Edit key modal -->
+    <div class="modal" id="myModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Edit</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form id="editShape">
+                        <div class="form-group row">
+                            <label for="selectShape" class="col-sm-4 col-form-label">Shape</label>
+                            <select class="form-control col-sm-6" id="selectShape">
+                                <option value="rect">Rectangle</option>
+                                <option value="circle">Circle</option>
+                                <option value="pie">Fraction Pie</option>
+                            </select>
+                        </div>
+                    </form>
+                    <form id="editRect" style="display: none;">
+                        <div class="form-group row">
+                            <label for="keyWidth" class="col-sm-4 col-form-label">Width</label>
+                            <div class="col-sm-6">
+                                <input type="number" class="form-control" id="keyWidth" aria-describedby="passwordHelpInline">
+                            </div>
+                            <small id="widthHelpInline" class="text-muted col-sm-2">px</small>
+                        </div>
+                        <div class="form-group row">
+                            <label for="keyHeight" class="col-sm-4 col-form-label">Height</label>
+                            <div class="col-sm-6">
+                                <input type="number" class="form-control" id="keyHeight" aria-describedby="heightHelpInline">
+                            </div>
+                            <small id="heightHelpInline" class="text-muted col-sm-2">px</small>
+                        </div>
+                        <div class="form-group row">
+                            <label for="keyHeight" class="col-sm-4 col-form-label">Border radius</label>
+                            <div class="col-sm-6">
+                                <input type="number" class="form-control" id="keyBRadius" aria-describedby="bRadiusHelpInline">
+                            </div>
+                            <small id="bRadiusHelpInline" class="text-muted col-sm-2">px</small>
+                        </div>
+                    </form>
+                    <form id="editCirclePie">
+                        <div class="form-group row">
+                            <label for="keyRadius" class="col-sm-4 col-form-label">Key radius</label>
+                            <div class="col-sm-6">
+                                <input type="number" class="form-control" id="keyRadius" aria-describedby="kRadiusHelpInline">
+                            </div>
+                            <small id="kRadiusHelpInline" class="text-muted col-sm-2">px</small>
+                        </div>
+                    </form>
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button id="submitKeyEdit" type="button" class="btn btn-success" data-dismiss="modal">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save and Load Keyboard -->
+    <footer class="footer fontKey" id="footer">
+        <div class="container">
+            <button type="button" class="btn btn-info" id="zoomout">Zoom Out</button>
+            <button type="button" class="btn btn-info" id="zoomin">Max Zoom</button>
+            <button type="button" class="btn btn-outline-primary" id="saveKeyboard" style="display: none;">Save keyboard</button>
+            <span class="btn btn btn-outline-primary btn-file">	Load keyboard <input type="file" id="loadKeyboard" name="files[]"></span>
+            <input type="checkbox" id="disableKbMoving"> Disable keyboard moving
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+
+</body>
 </html>
