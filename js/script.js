@@ -6,13 +6,16 @@ document.getElementById("kbheight").min = "200";
 
 //Inicijalizacija osnovnih varijabli
 var svgwidth = window.innerWidth;
-var svgheight = window.innerHeight-document.getElementById("footer").offsetHeight-document.getElementById("generalsettings").offsetHeight-10;
+var svgheight = window.innerHeight-document.getElementById("footer").offsetHeight-document.getElementById("generalsettings").offsetHeight
+	-document.getElementById("wpm").offsetHeight-document.getElementById("wpmOutputDiv").offsetHeight-10;
 var keyboardJSON = {
 	"kbwidth": document.getElementById("kbwidth").value=Math.floor(svgwidth*0.97),
 	"kbheight": document.getElementById("kbheight").value=Math.floor(svgheight*0.7),
 	"keyboard": []
 };
-var defKeys =[];
+var defKeys =[{"shape":"rect", "x":parseInt(svgwidth/7+parseInt((keyboardJSON.kbheight)/7)+10),"y":parseInt((keyboardJSON.kbheight)/7),"width":parseInt((keyboardJSON.kbheight)/7),"height":parseInt((keyboardJSON.kbheight)/7),"br":5,"rotation":0,"char":""},
+				{"shape":"circle", "x":parseInt(svgwidth/7+parseInt((keyboardJSON.kbheight)/7*2)+20),"y":parseInt((keyboardJSON.kbheight)/7),"r":parseInt((keyboardJSON.kbheight)/7/2),"char":""},
+				{"shape":"pie", "x":parseInt(svgwidth/7+parseInt((keyboardJSON.kbheight)/7*3)+30),"y":parseInt((keyboardJSON.kbheight)/7),"r":parseInt((keyboardJSON.kbheight)/7),"rotation":0,"char":""}];
 var init = {};
 var svgratio = svgwidth/svgheight;
 var	kbXpos = (svgwidth-keyboardJSON.kbwidth)/2;
@@ -28,7 +31,7 @@ var svg = d3.select("#appbody")
 	.attr("id","svgID")
 	.attr("viewBox", "0 0 "+svgwidth+" "+svgheight);
 
-//Prilikom povlačenja okvira tipkovnice ili bilo koje tipke mišom pozivaju se odgovarajuće funkcije
+//Prilikom povlačenja okvira tipkovnice ili bilo koje tipke mišem pozivaju se odgovarajuće funkcije
 var dragFrame = d3.drag()
 	.on("drag", frameDragged);
 var drag_behavior = d3.drag()
@@ -57,6 +60,7 @@ var keyboardFrame = svg.selectAll("rect")
 var keyboard = svg.append("g").attr("id", "keySpace").attr("transform", "translate("+kbXpos+", "+kbYpos+")");
 var defSpace = svg.append("g").attr("id", "defSpace");
 
+//Deklariramo varijablu text kao globalnu tako da ju je moguće iz svih funkcija ažurirati
 var text = keyboard.selectAll("text")
 	.data(keyboardJSON.keyboard).enter().append("text");
 
@@ -76,6 +80,7 @@ function start(){
 	$('#addkey').show();
 	$('#gSettings').hide();
 	$('#keyOption').show();
+	update(defSpace,defKeys);
 }
 
 //Ažurira veličinu i poziciju okvira tipkovnice
@@ -187,8 +192,9 @@ function update(space,keys){
 		rect.classed("def",true);
 		circle.classed("def",true);
 		pie.classed("def",true);
+	}else{
+		realTime();
 	}
-
 	//Brisanje uklonjenih tipki 
 	rect.exit().remove();
 	circle.exit().remove();
@@ -236,6 +242,7 @@ function frameDragged(d){
 	}
 }
 
+//Kada tek kliknemo na tipku prije povlačenja, funkcija privremeno sprema početne koordinate
 function dragstarted(d) {
 	d3.select(this).classed("active", true).raise();
 	init.x=d.x;
@@ -265,9 +272,9 @@ function dragged(d) {
 		d.x=d3.event.x;
 		d.y=d3.event.y;
 		d3.select(this)
-			.attr("transform", function(d){return "translate("+(d.x-d.r/2)+" "+(d.y-d.r/2)+") rotate("+(d.rotation*90)+" "+(d.r/2)+" "+(d.r/2)+")"})
-
+			.attr("transform", function(d){return "translate("+(d.x-d.r/2)+" "+(d.y-d.r/2)+") rotate("+(d.rotation*90)+" "+(d.r/2)+" "+(d.r/2)+")"});		
 	}
+	realTime();
 }
 
 function dragended(d, i) {
@@ -544,38 +551,6 @@ function submitKeyEdit(){
 	update(keyboard,keyboardJSON.keyboard);
 }
 
-//Učitavanje ranije spremljene tipkovnice s računala
-function loadKeyboard(evt) {
-	var selectedFile = evt.target.files[0];
-	var reader = new FileReader();
-	var fileUpload=document.getElementById("loadKeyboard").files[0];
-	//Ako je odabrana .json datoteka
-	if (selectedFile.type=="application/json"){
-		reader.readAsText(fileUpload/*, "UTF-8"*/);
-		reader.onload = (function(theFile) {
-			return function(e) {
-				keyboardJSON = JSON.parse(e.target.result);
-				$('#kbwidth').val(keyboardJSON.kbwidth);
-				$('#kbheight').val(keyboardJSON.kbheight);
-				setKeyboardFrame();
-				if ($("#start").is(":visible")){
-					document.getElementById("start").click();
-				}else{
-					defKeys=[];
-					keyboard.selectAll("*").remove();
-					defSpace.selectAll("*").remove();
-					keyboard = svg.append("g").attr("id", "keySpace").attr("transform", "translate("+kbXpos+", "+kbYpos+")");
-					defSpace = svg.append("g").attr("id", "defSpace");
-				}
-				document.getElementById("loadKeyboard").value = "";
-				update(defSpace,defKeys);
-				update(keyboard,keyboardJSON.keyboard);};
-		})(selectedFile);
-	}else{
-		alert("Please Select .json file")
-	}
-}
-
 //Funkcija koja sprema konfiguraciju kreirane tipkovnice na računalo
 function saveKeyboard(){
 	var data = JSON.stringify(keyboardJSON, null, 4);
@@ -591,6 +566,123 @@ function saveKeyboard(){
     link.dispatchEvent( event );
 }
 
+//Učitavanje ranije spremljene tipkovnice s računala
+function loadKeyboard(evt) {
+	var selectedFile = evt.target.files[0];
+	var reader = new FileReader();
+	var fileUpload=document.getElementById("loadKeyboard").files[0];
+	//Ako je odabrana .json datoteka
+	if (selectedFile.type=="application/json"){
+		reader.readAsText(fileUpload/*, "UTF-8"*/);
+		reader.onload = (function(theFile) {
+			return function(e) {
+				//Učitanu konfiguraciju tipkovnice spremiti u keyboardJSON
+				keyboardJSON = JSON.parse(e.target.result);
+				//Postaviti nove dimenzije okvira tipkovnice koje su spremljene u datoteci
+				$('#kbwidth').val(keyboardJSON.kbwidth);
+				$('#kbheight').val(keyboardJSON.kbheight);
+				setKeyboardFrame();
+
+				if ($("#start").is(":visible")){
+					document.getElementById("start").click();
+				}else{
+					defKeys=[];
+					keyboard.selectAll("*").remove();
+					defSpace.selectAll("*").remove();
+					keyboard = svg.append("g").attr("id", "keySpace").attr("transform", "translate("+kbXpos+", "+kbYpos+")");
+					defSpace = svg.append("g").attr("id", "defSpace");
+				}
+				document.getElementById("loadKeyboard").value = "";
+				update(defSpace,defKeys);
+				update(keyboard,keyboardJSON.keyboard);
+			};				
+		})(selectedFile);
+	}else{
+		alert("Please Select .json file")
+	}
+}
+
+var firstChar=[];
+var secondChar=[];
+var digramProbability=[];
+
+//Učitavanje statistike digrama
+function loadDigramStatistics(evt) {
+	firstChar=[];
+	secondChar=[];
+	digramProbability=[];
+	var selectedFile = evt.target.files[0];
+	var reader = new FileReader();
+	var fileUpload=document.getElementById("loadDigramStatistics").files[0];
+	reader.readAsText(fileUpload, 'UTF-8');
+	reader.onload = (function(theFile) {
+		return function(e) {
+			var rows=e.target.result.split("\n");
+			var tmp=0;
+			for (var i = 0; i < rows.length; i++) {
+				if (rows[i][2] == ";") {
+					var cols = rows[i].split(";");  
+					firstChar.push(cols[0].charAt(0));
+					secondChar.push(cols[0].charAt(1));
+					digramProbability.push(cols[1].replace(",", "."));
+				}
+			}
+		$('#loadDigramText').html(selectedFile.name);
+		realTime();
+		}
+	})(selectedFile);
+}
+
+//Ukoliko je uključen "real-time" računa WPM(max) prilikom svake promjene u geometriji ili dodatno unesenim stvarima
+function realTime(){
+	if(d3.select('#realtime').property('checked')){
+		calculateWpmMax();
+	}
+}
+
+//Računanje WPM(max)-a
+function calculateWpmMax(){
+	var sum=0;
+	var indexF, indexS;
+	var tmpX1, tmpY1, tmpX2, tmpY2;
+	var A, W, P, MT;
+
+	if($('#fittsA').val()==""){
+		var a=1.0;
+	}else var a=parseFloat($('#fittsA').val());
+	if($('#fittsB').val()==""){
+		var b=1.0;
+	}else var b=parseFloat($('#fittsB').val());
+
+	//Prolazi sve parove iz statistike digrama
+	for(var i=0; i<firstChar.length; i++){
+		indexF = keyboardJSON.keyboard.findIndex(function(d) {
+			return d.char == firstChar[i];
+		});
+		indexS = keyboardJSON.keyboard.findIndex(function(d) {
+			return d.char == secondChar[i];
+		});
+		//Ukoliko postoje tipke u geometriji
+		if(indexF!=-1 && indexS!=-1){
+			P=digramProbability[i];
+			tmpX1=keyboardJSON.keyboard[indexF].x;
+			tmpY1=keyboardJSON.keyboard[indexF].y;
+			tmpX2=keyboardJSON.keyboard[indexS].x;
+			tmpY2=keyboardJSON.keyboard[indexS].y;
+			A = Math.sqrt( Math.pow((tmpX1-tmpX2), 2) + Math.pow((tmpY1-tmpY2), 2) );
+			if(keyboardJSON.keyboard[indexS].shape=="rect") W = Math.min(keyboardJSON.keyboard[indexS].width,keyboardJSON.keyboard[indexS].height);
+			if(keyboardJSON.keyboard[indexS].shape=="circle") W = keyboardJSON.keyboard[indexS].r*2;
+			if(keyboardJSON.keyboard[indexS].shape=="pie") W = keyboardJSON.keyboard[indexS].r;
+		
+			MT = a + b * Math.log2(A/W + 1);
+			sum = sum + P * MT;
+		}
+	}
+	if(firstChar.length>0 && sum>0){
+		$('#wpmOutput').html((1/sum) * 12);
+	}else $('#wpmOutput').html("?");
+}
+
 //Pridruživanje odgovarajućih funkcija tipkama
 $('#kbsize').click(setKeyboardFrame);
 $('#start').click(start);
@@ -602,8 +694,17 @@ $('#editKey').click(editKey);
 $('#submitKeyEdit').click(submitKeyEdit);
 $('#rotate').click(rotate);
 $('#delete').click(deleteKey);
+$('#calcWPM').click(calculateWpmMax);
+
+//Pridruživanje odgovarajućih funkcija tipkama za učitavanje i spremanje datoteka
 document.getElementById('loadKeyboard').addEventListener('change', loadKeyboard, false);
+document.getElementById('loadDigramStatistics').addEventListener('change', loadDigramStatistics, false);
 document.getElementById('saveKeyboard').addEventListener('click', saveKeyboard);
+
+//Prilikom svake promjene fittsovih koeficienata pozvati realTime funkciju
+$('#fittsA').on('keyup paste',realTime);
+$('#fittsB').on('keyup paste',realTime);
+$('#realtime').change(realTime);
 
 //Samo iz estetskog razloga
 zoomOut();

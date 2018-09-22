@@ -18,7 +18,7 @@
     <script src="js/bootstrap.min.js"></script>
 
     <!-- Set keyboard size, add new default keys -->
-    <nav class="bg-dark navbar fontKey" id="generalsettings">
+    <nav class="bg-dark navbar fontKey" style="height: 60px;" id="generalsettings">
         <div class="container-fluid justify-content-md-center">
             <form class="form-inline" id="gSettings">
                 <div class="form-group text-light">
@@ -62,6 +62,39 @@
 
     <!-- App body -->
     <div id="appbody"></div>
+
+    <!-- Input Fitts' coefficient and Digram statistics file -->
+    <div id="wpm" class="align-items-center row" style="width:100%; margin-top:1px; margin-bottom: 1px;display: flex;justify-content: center;">
+        <div>
+            <b>Fitts' coefficient </b>"a":&nbsp;
+        </div>
+        <div>
+            <input type="text" class="form-control form-control-sm" id="fittsA" value="1.0" placeholder="Only float with dot!"   
+                onkeypress="return (event.charCode >= 48 && event.charCode <= 57) ||  
+                event.charCode == 46 || event.charCode == 0 ">
+        </div>&nbsp;
+        <div>"b":</div>&nbsp;
+        <div>
+            <input type="text" class="form-control form-control-sm" id="fittsB" value="1.0" placeholder="Only float with dot!"   
+                onkeypress="return (event.charCode >= 48 && event.charCode <= 57) ||  
+                event.charCode == 46 || event.charCode == 0 ">
+        </div>&nbsp;&nbsp;
+        <div><b>Digram statistics:</b></div>&nbsp;
+        <div style="display: flex;justify-content: center;">
+            <span class="btn btn-sm btn-outline-primary btn-file"><span id="loadDigramText">Browse</span><input type="file" id="loadDigramStatistics" name="files[]" accept=".csv"></span>
+        </div>&nbsp;&nbsp;
+        <button type="button" class="btn btn-sm btn-success" id="calcWPM">Calc</button>
+    </div>
+
+    <!-- WPM(max) Output -->
+    <div id="wpmOutputDiv" class="align-items-center row" style="width:100%; margin-top:1px; margin-bottom: 1px;display: flex;justify-content: center;">
+        <div class="col-sm-2">
+            <input type="checkbox" id="realtime" checked> real-time
+        </div>
+        <div style="color: red">
+            <b>WPM(max)=</b>&nbsp;<span id="wpmOutput">?</span>
+        </div>
+    </div>
 
     <!-- Edit key modal -->
     <div class="modal" id="myModal">
@@ -128,11 +161,11 @@
     <!-- Save and Load Keyboard -->
     <footer class="footer fontKey" id="footer">
         <div class="container">
-            <button type="button" class="btn btn-info" id="zoomout">Zoom Out</button>
-            <button type="button" class="btn btn-info" id="zoomin">Max Zoom</button>
-            <button type="button" class="btn btn-outline-primary" id="saveKeyboard" style="display: none;">Save keyboard</button>
-            <span class="btn btn btn-outline-primary btn-file">	Load keyboard <input type="file" id="loadKeyboard" name="files[]"></span>
-            <input type="checkbox" id="disableKbMoving"> Disable keyboard moving
+            <button type="button" class="btn btn-sm btn-info" id="zoomout">Zoom Out</button>
+            <button type="button" class="btn btn-sm btn-info" id="zoomin">Max Zoom</button>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="saveKeyboard" style="display: none;">Save keyboard</button>
+            <span class="btn btn-sm btn-outline-primary btn-file">	Load keyboard <input type="file" id="loadKeyboard" name="files[]" accept=".json"></span>
+            Disable keyboard moving <input type="checkbox" id="disableKbMoving">
         </div>
     </footer>
 
